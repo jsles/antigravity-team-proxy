@@ -1150,6 +1150,7 @@
             "title": "Request Details",
             "request_payload": "Request Payload",
             "response_payload": "Response Payload",
+            "user_name": "User Name",
             "duration": "Duration",
             "tokens": "Tokens (I/O)",
             "time": "Time",

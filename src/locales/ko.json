@@ -1006,6 +1006,7 @@
             "title": "요청 상세",
             "request_payload": "요청 페이로드",
             "response_payload": "응답 페이로드",
+            "user_name": "사용자명",
             "duration": "소요 시간",
             "tokens": "토큰 (입력/출력)",
             "time": "시간",

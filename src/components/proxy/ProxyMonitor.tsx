@@ -27,6 +27,7 @@ interface ProxyRequestLog {
     input_tokens?: number;
     output_tokens?: number;
     account_email?: string;
+    username?: string;
     protocol?: string;  // "openai" | "anthropic" | "gemini"
 }
 
@@ -102,8 +103,13 @@ const LogTable: React.FC<LogTableProps> = ({
                                     </span>
                                 )}
                             </td>
-                            <td className="text-gray-600 dark:text-gray-400 truncate text-[10px]" style={{ width: '140px', maxWidth: '140px' }} title={log.account_email || ''}>
-                                {log.account_email ? log.account_email.replace(/(.{3}).*(@.*)/, '$1***$2') : '-'}
+                            <td className="text-gray-600 dark:text-gray-400 truncate text-[10px]" style={{ width: '140px', maxWidth: '140px' }}>
+                                <div className="flex flex-col gap-0.5">
+                                    {log.username && <div className="text-green-600 font-bold">@{log.username}</div>}
+                                    <div className="opacity-70" title={log.account_email || ''}>
+                                        {log.account_email ? log.account_email.replace(/(.{3}).*(@.*)/, '$1***$2') : '-'}
+                                    </div>
+                                </div>
                             </td>
                             <td className="truncate" style={{ width: '180px', maxWidth: '180px' }}>{log.url}</td>
                             <td className="text-right text-[9px]" style={{ width: '90px' }}>
@@ -635,6 +641,12 @@ export const ProxyMonitor: React.FC<ProxyMonitorProps> = ({ className }) => {
                                         )}
                                     </div>
                                 </div>
+                                {selectedLog.username && (
+                                    <div className="mt-5 pt-5 border-t border-gray-200 dark:border-base-300">
+                                        <span className="block text-gray-500 dark:text-gray-400 uppercase font-black text-[10px] tracking-widest mb-2">{t('monitor.details.user_name') || 'User Name'}</span>
+                                        <span className="font-mono font-bold text-green-600 text-xs">@{selectedLog.username}</span>
+                                    </div>
+                                )}
                                 {selectedLog.account_email && (
                                     <div className="mt-5 pt-5 border-t border-gray-200 dark:border-base-300">
                                         <span className="block text-gray-500 dark:text-gray-400 uppercase font-black text-[10px] tracking-widest mb-2">{t('monitor.details.account_used')}</span>
