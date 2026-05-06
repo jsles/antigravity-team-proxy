@@ -720,7 +720,14 @@ pub async fn handle_list_models(
         })
         .collect();
 
-    Ok(Json(json!({ "models": models })))
+    // 첫 번째 유효한 토큰의 이메일 추출 (헤더 표시용)
+    let email = state.token_manager.get_all_tokens().await.first().map(|t| t.email.clone()).unwrap_or_default();
+
+    Ok((
+        StatusCode::OK,
+        [("X-Account-Email", email)],
+        Json(json!({ "models": models }))
+    ).into_response())
 }
 
 pub async fn handle_get_model(Path(model_name): Path<String>) -> impl IntoResponse {

@@ -156,11 +156,33 @@ async fn auth_middleware_internal(
             }
         }
     } else {
-        // AI 代理接口：仅允许使用 api_key
-        api_key.map(|k| k == security.api_key).unwrap_or(false)
+        // AI 代理接口：仅允许使用 api_key (지원: username:api_key 형식)
+        api_key.map(|k| {
+            if k.contains(':') {
+                let parts: Vec<&str> = k.splitn(2, ':').collect();
+                parts[1] == security.api_key
+            } else {
+                k == security.api_key
+            }
+        }).unwrap_or(false)
     };
 
     if authorized {
+        // [추가] username:key 형식인 경우 Identity를 주입하여 로그에 남도록 함
+        if let Some(token) = api_key {
+            if token.contains(':') {
+                let parts: Vec<&str> = token.splitn(2, ':').collect();
+                let identity = UserTokenIdentity {
+                    token_id: "master_key_with_user".to_string(),
+                    token: token.to_string(),
+                    username: parts[0].to_string(),
+                };
+                let (mut parts, body) = request.into_parts();
+                parts.extensions.insert(identity);
+                let request = Request::from_parts(parts, body);
+                return Ok(next.run(request).await);
+            }
+        }
         Ok(next.run(request).await)
     } else if !force_strict && api_key.is_some() {
         // 尝试验证 UserToken

@@ -28,29 +28,39 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
         content_length = int(self.headers.get('Content-Length', 0))
         post_data = self.rfile.read(content_length)
         
-        # 로그 추가
+        auth_header = self.headers.get('Authorization', '')
+        token = auth_header[7:].strip() if auth_header.startswith('Bearer ') else "unknown"
+        username = token.split(':')[0] if ':' in token else token
+        
+        # 로그 추가 (사용자명 포함)
         log_entry = {
             "time": datetime.now().strftime("%H:%M:%S"),
             "method": "POST",
             "path": self.path,
+            "user": username,
             "status": 200
         }
         stats["logs"].insert(0, log_entry)
         if len(stats["logs"]) > 10: stats["logs"].pop()
 
-        target_url = "https://generativelanguage.googleapis.com" + self.path
+        # Render 서버로 전달 (업스트림)
+        target_base = "https://antigravity-team-proxy.onrender.com"
+        target_url = target_base + self.path
+        
         headers = {k: v for k, v in self.headers.items() if k.lower() not in ['host', 'content-length']}
         
         try:
             req = urllib.request.Request(target_url, data=post_data, headers=headers, method='POST')
             with urllib.request.urlopen(req) as response:
                 self.send_response(response.status)
+                log_entry["status"] = response.status
                 for k, v in response.getheaders():
                     self.send_header(k, v)
                 self.end_headers()
                 self.wfile.write(response.read())
         except Exception as e:
             self.send_response(500)
+            log_entry["status"] = 500
             self.end_headers()
             self.wfile.write(str(e).encode())
 
