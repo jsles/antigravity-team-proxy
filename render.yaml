@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: antigravity-proxy
+    runtime: docker
+    dockerContext: .
+    dockerfilePath: deploy_cloud/Dockerfile
+    envVars:
+      - key: API_KEY
+        sync: false
+        placeholder: "sk-antigravity-team-shared"
+      - key: WEB_PASSWORD
+        sync: false
+        placeholder: "admin-password-123"
+      - key: PORT
+        value: 8045
+    healthCheckPath: /dashboard
+    autoDeploy: true
