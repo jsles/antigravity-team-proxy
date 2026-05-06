@@ -721,7 +721,8 @@ pub async fn handle_list_models(
         .collect();
 
     // 첫 번째 유효한 토큰의 이메일 추출 (헤더 표시용)
-    let email = state.token_manager.get_all_tokens().await.first().map(|t| t.email.clone()).unwrap_or_default();
+    let email_list = state.token_manager.get_all_tokens().await;
+    let email = email_list.first().map(|t| t.email.as_str()).unwrap_or("");
 
     Ok((
         StatusCode::OK,
