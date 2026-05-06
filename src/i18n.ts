@@ -84,7 +84,8 @@ i18n
                 translation: my,
             },
         },
-        fallbackLng: "en",
+        lng: "ko", // [MOD] Force Korean as default
+        fallbackLng: "ko", // [MOD] Set fallback to Korean
         debug: false, // Set to true for development
 
         interpolation: {
