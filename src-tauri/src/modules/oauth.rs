@@ -587,6 +587,18 @@ pub async fn refresh_access_token_with_client(
     account_id: Option<&str>,
     preferred_client_key: Option<&str>,
 ) -> Result<TokenResponse, String> {
+    // [NEW] Support Gemini API Keys directly
+    if refresh_token.starts_with("AIzaSy") {
+        return Ok(TokenResponse {
+            access_token: refresh_token.to_string(),
+            expires_in: 315360000, // 10 years
+            token_type: "Bearer".to_string(),
+            refresh_token: Some(refresh_token.to_string()),
+            id_token: None,
+            oauth_client_key: Some("gemini_api_key".to_string()),
+        });
+    }
+
     let candidates = get_candidate_clients(preferred_client_key);
     if candidates.is_empty() {
         return Err("No OAuth clients configured".to_string());
@@ -644,6 +656,17 @@ pub async fn refresh_access_token(
 
 /// Get user info
 pub async fn get_user_info(access_token: &str, account_id: Option<&str>) -> Result<UserInfo, String> {
+    // [NEW] Bypass userinfo for Gemini API Keys
+    if access_token.starts_with("AIzaSy") {
+        return Ok(UserInfo {
+            email: format!("gemini-api-key-{}@antigravity.proxy", &access_token[..10]),
+            name: Some("Gemini API Key".to_string()),
+            given_name: None,
+            family_name: None,
+            picture: None,
+        });
+    }
+
     let client = if let Some(pool) = crate::proxy::proxy_pool::get_global_proxy_pool() {
         pool.get_effective_client(account_id, 15).await
     } else {
