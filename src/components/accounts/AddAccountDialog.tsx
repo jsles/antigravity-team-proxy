@@ -208,8 +208,8 @@ function AddAccountDialog({ onAdd, showText = true }: AddAccountDialogProps) {
                 const parsed = JSON.parse(input);
                 if (Array.isArray(parsed)) {
                     tokens = parsed
-                        .map((item: any) => item.refresh_token)
-                        .filter((t: any) => typeof t === 'string' && t.startsWith('1//'));
+                        .map((item: any) => item.refresh_token || item.api_key)
+                        .filter((t: any) => typeof t === 'string' && (t.startsWith('1//') || t.startsWith('AIzaSy')));
                 }
             }
         } catch (e) {
@@ -219,7 +219,7 @@ function AddAccountDialog({ onAdd, showText = true }: AddAccountDialogProps) {
 
         // 2. 如果 JSON 解析没有结果,尝试正则提取 (或者输入不是 JSON)
         if (tokens.length === 0) {
-            const regex = /1\/\/[a-zA-Z0-9_\-]+/g;
+            const regex = /(1\/\/[a-zA-Z0-9_\-]+|AIzaSy[a-zA-Z0-9_\-]+)/g;
             const matches = input.match(regex);
             if (matches) {
                 tokens = matches;
