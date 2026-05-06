@@ -469,6 +469,10 @@ export const ProxyMonitor: React.FC<ProxyMonitorProps> = ({ className }) => {
                         {isLoggingEnabled ? t('monitor.logging_status.active') : t('monitor.logging_status.paused')}
                     </button>
 
+                    <div className="badge badge-success badge-sm font-bold text-white shadow-sm ml-2" title="Deployed with account info fix">
+                        v4.1.34-patch1
+                    </div>
+
                     <div className="relative flex-1">
                         <Search className="absolute left-2.5 top-2 text-gray-400" size={14} />
                         <input
