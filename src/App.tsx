@@ -71,18 +71,14 @@ function App() {
     loadConfig();
   }, [loadConfig]);
 
-  // Sync language from config
+  // Sync language from config (Forced to 'ko' for team deployment)
   useEffect(() => {
-    if (config?.language) {
-      i18n.changeLanguage(config.language);
-      // Support RTL
-      if (config.language === 'ar') {
-        document.documentElement.dir = 'rtl';
-      } else {
-        document.documentElement.dir = 'ltr';
-      }
-    }
-  }, [config?.language, i18n]);
+    // [FORCED] Always use Korean for this proxy instance
+    const targetLang = 'ko';
+    i18n.changeLanguage(targetLang);
+    document.documentElement.dir = 'ltr';
+    document.documentElement.lang = targetLang;
+  }, [i18n]);
 
   // Listen for tray events
   useEffect(() => {
