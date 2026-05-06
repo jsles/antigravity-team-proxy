@@ -127,14 +127,14 @@ pub async fn monitor_middleware(
     // Extract account email from X-Account-Email header if present
     let account_email = response
         .headers()
-        .get("X-Account-Email")
+        .get("x-account-email")
         .and_then(|v| v.to_str().ok())
         .map(|s| s.to_string());
 
     // Extract mapped model from X-Mapped-Model header if present
     let mapped_model = response
         .headers()
-        .get("X-Mapped-Model")
+        .get("x-mapped-model")
         .and_then(|v| v.to_str().ok())
         .map(|s| s.to_string());
 
@@ -151,8 +151,15 @@ pub async fn monitor_middleware(
 
     // Client IP has been extracted at the beginning of the function
 
-    // Extract username from UserTokenIdentity if present
-    let username = user_token_identity.as_ref().map(|identity| identity.username.clone());
+    // Extract username from UserTokenIdentity if present, or fallback to X-Account-Email request header
+    let mut username = user_token_identity.as_ref().map(|identity| identity.username.clone());
+    if username.is_none() || username.as_deref() == Some("") {
+        username = request
+            .headers()
+            .get("x-account-email")
+            .and_then(|v| v.to_str().ok())
+            .map(|s| s.to_string());
+    }
 
     let monitor = state.monitor.clone();
     let mut log = ProxyRequestLog {
