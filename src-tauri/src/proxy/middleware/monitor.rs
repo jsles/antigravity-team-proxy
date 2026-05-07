@@ -80,6 +80,12 @@ pub async fn monitor_middleware(
         None
     };
 
+    let x_account_email = request
+        .headers()
+        .get("x-account-email")
+        .and_then(|v| v.to_str().ok())
+        .map(|s| s.to_string());
+
     let request_body_str;
     
     // [FIX] 从请求 extensions 提取 UserTokenIdentity (由 Auth 中间件注入)
@@ -154,11 +160,7 @@ pub async fn monitor_middleware(
     // Extract username from UserTokenIdentity if present, or fallback to X-Account-Email request header
     let mut username = user_token_identity.as_ref().map(|identity| identity.username.clone());
     if username.is_none() || username.as_deref() == Some("") {
-        username = request
-            .headers()
-            .get("x-account-email")
-            .and_then(|v| v.to_str().ok())
-            .map(|s| s.to_string());
+        username = x_account_email;
     }
 
     let monitor = state.monitor.clone();
