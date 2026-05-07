@@ -260,10 +260,11 @@ pub fn wrap_request(
         // [FIX #1747] Ensure max_tokens (maxOutputTokens) is greater than thinking_budget
         // Google v1internal requires maxOutputTokens > thinkingBudget.
         // [FIX #1825] Handle adaptive fallback (incl. -1 and thinkingLevel)
-        let thinking_config_opt = gen_config.get("thinkingConfig");
-        let is_adaptive = thinking_config_opt.map_or(false, |t| {
-            t.get("thinkingLevel").is_some() || t.get("thinkingBudget").and_then(|v| v.as_i64()) == Some(-1)
-        }) || (thinking_config_opt.and_then(|t| t.get("thinkingBudget").and_then(|v| v.as_u64())) == Some(32768) && is_claude);
+        let is_adaptive = if let Some(t) = gen_config.get("thinkingConfig") {
+            t.get("thinkingLevel").is_some() || t.get("thinkingBudget").and_then(|v| v.as_i64()) == Some(-1) || (t.get("thinkingBudget").and_then(|v| v.as_u64()) == Some(32768) && is_claude)
+        } else {
+            false
+        };
 
         if let Some(thinking_config) = gen_config.get("thinkingConfig") {
             let budget_opt = thinking_config.get("thinkingBudget").and_then(|v| v.as_i64());
@@ -540,7 +541,8 @@ pub fn wrap_request(
     // [NEW] 1. 深度对齐 requestId 格式 (官方格式: agent/{timestamp_ms}/{random_hex_8bytes})
     // 每次请求生成完全唯一的 ID，避免重试时的幂等性冲突导致 Google 返回旧缓存
     let timestamp_ms = chrono::Utc::now().timestamp_millis();
-    let random_hex = &uuid::Uuid::new_v4().simple().to_string()[..8]; // 移除对外部 hex crate 的依赖
+    let uuid_str = uuid::Uuid::new_v4().to_string().replace("-", ""); // 移除对外部 hex crate 的依赖
+    let random_hex = &uuid_str[..8]; 
     let official_request_id = format!("agent/{}/{}", timestamp_ms, random_hex);
 
     // [NEW] 2. 动态 userAgent 仿真 (支持 jetski)
