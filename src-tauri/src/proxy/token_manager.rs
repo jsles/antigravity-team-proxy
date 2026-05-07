@@ -566,7 +566,6 @@ impl TokenManager {
         self.tokens.iter().map(|entry| entry.value().clone()).collect()
     }
 
-    }
 
     /// 检查账号是否应该被配额保护
     /// 如果配额低于阈值，自动禁用账号并返回 true
