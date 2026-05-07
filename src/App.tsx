@@ -63,7 +63,7 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  const { config, loadConfig } = useConfigStore();
+  const { loadConfig } = useConfigStore();
   const { fetchCurrentAccount, fetchAccounts } = useAccountStore();
   const { i18n } = useTranslation();
 
