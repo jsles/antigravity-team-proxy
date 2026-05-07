@@ -61,6 +61,12 @@ pub struct TokenManager {
     /// 支持优雅关闭时主动 abort 后台任务
     auto_cleanup_handle: Arc<tokio::sync::Mutex<Option<tokio::task::JoinHandle<()>>>>,
     cancel_token: CancellationToken,
+    
+    // Added method to retrieve all tokens as a Vec for UI/email extraction
+    // This method is async to match existing call sites like `state.token_manager.get_all_tokens().await`
+    // It simply clones the ProxyToken entries from the internal DashMap.
+    // Note: Cloning is cheap because ProxyToken fields are mostly Strings and small collections.
+
 }
 
 impl TokenManager {
@@ -550,6 +556,16 @@ impl TokenManager {
             model_quotas,
             model_limits,
         }))
+    }
+
+    /// Retrieve all ProxyToken entries as a Vec.
+    /// This is used by the Gemini handler to extract the first token's email for header display.
+    /// Returns a vector of cloned ProxyToken objects.
+    pub async fn get_all_tokens(&self) -> Vec<ProxyToken> {
+        // Collect clones of all tokens stored in the DashMap.
+        self.tokens.iter().map(|entry| entry.value().clone()).collect()
+    }
+
     }
 
     /// 检查账号是否应该被配额保护
