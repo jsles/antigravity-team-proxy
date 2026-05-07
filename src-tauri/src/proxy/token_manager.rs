@@ -2726,7 +2726,7 @@ impl TokenManager {
 
         Ok(())
     }
-
+}
 
 /// 截断过长的原因字符串
 fn truncate_reason(reason: &str, max_len: usize) -> String {
