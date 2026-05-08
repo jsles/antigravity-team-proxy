@@ -105,6 +105,44 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+/// Automatically initialize default account from environment variables if no accounts exist.
+fn auto_initialize_accounts() {
+    let upstream_key = std::env::var("GEMINI_API_KEY")
+        .or_else(|_| std::env::var("ABV_UPSTREAM_KEY"))
+        .ok();
+    
+    if let Some(key) = upstream_key {
+        if !key.trim().is_empty() {
+            match crate::modules::account::list_accounts() {
+                Ok(accounts) if accounts.is_empty() => {
+                    info!("No accounts found. Automatically initializing default account from environment variable.");
+                    let token = crate::models::TokenData::new(
+                        key.clone(),
+                        "env_refresh_token".to_string(),
+                        3600,
+                        Some("system_default@antigravity".to_string()),
+                        None,
+                        None,
+                        true,
+                        None,
+                    );
+                    if let Err(e) = crate::modules::account::add_account(
+                        "system_default@antigravity".to_string(),
+                        Some("System Default".to_string()),
+                        token,
+                    ) {
+                        error!("Failed to auto-initialize account: {}", e);
+                    } else {
+                        info!("Successfully auto-initialized system default account.");
+                    }
+                }
+                Err(e) => error!("Failed to check account list: {}", e),
+                _ => {} // Already has accounts or failed to list
+            }
+        }
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     // Check for headless mode
@@ -248,6 +286,9 @@ pub fn run() {
                     info!("💡 Search docker logs or grep gui_config.json to find them.");
                     info!("--------------------------------------------------");
 
+                    // Automatically initialize accounts from environment variables
+                    auto_initialize_accounts();
+
                     // [FIX #1460] Persist environment overrides to ensure they are visible in Web UI/load_config
                     if modified {
                         if let Err(e) = modules::config::save_app_config(&config) {
@@ -359,6 +400,9 @@ pub fn run() {
                     let state = handle.state::<commands::proxy::ProxyServiceState>();
                     let cf_state = handle.state::<commands::cloudflared::CloudflaredState>();
                     let integration = crate::modules::integration::SystemManager::Desktop(handle.clone());
+
+                    // Automatically initialize accounts from environment variables
+                    auto_initialize_accounts();
 
                     // 1. 确保管理后台开启
                     if let Err(e) = commands::proxy::ensure_admin_server(

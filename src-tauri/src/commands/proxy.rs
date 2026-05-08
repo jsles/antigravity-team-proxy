@@ -170,13 +170,7 @@ pub async fn internal_start_proxy_service(
         let zai_enabled = config.zai.enabled
             && !matches!(config.zai.dispatch_mode, crate::proxy::ZaiDispatchMode::Off);
         if !zai_enabled {
-            tracing::warn!("沒有可用賬號，反代邏輯將暫停，請通過管理界面添加。");
-            return Ok(ProxyStatus {
-                running: false,
-                port: config.port,
-                base_url: format!("http://127.0.0.1:{}", config.port),
-                active_accounts: 0,
-            });
+            tracing::warn!("현재 활성화된 계정이 없습니다. 프록시 서비스는 시작되지만 요청이 실패할 수 있습니다.");
         }
     }
 
@@ -192,13 +186,11 @@ pub async fn internal_start_proxy_service(
         server_handle: tokio::spawn(async {}), // 逻辑上的 handle
     };
 
-    // [FIX] Ensure the server is logically running
+    // [FIX] Ensure the server is logically running even with 0 accounts
     axum_server.set_running(true).await;
 
     *instance_lock = Some(instance);
 
-    // 成功启动后，guard 在这里结束并重置 starting 是 OK 的
-    // 但其实我们可以直接手动掉，或者相信 guard
     Ok(ProxyStatus {
         running: true,
         port: config.port,
