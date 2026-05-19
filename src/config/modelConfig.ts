@@ -175,6 +175,18 @@ export const MODEL_CONFIG: Record<string, ModelConfig> = {
         group: 'Claude',
         tags: ['opus', 'thinking'],
     },
+
+    // Gemma 系列
+    'gemma4:e4b': {
+        label: 'Gemma 4',
+        shortLabel: 'Gemma 4',
+        protectedKey: 'gemma',
+        Icon: Gemini.Color, // Use Gemini icon as placeholder or similar
+        i18nKey: 'proxy.model.gemma4',
+        i18nDescKey: 'proxy.model.gemma4',
+        group: 'Gemma',
+        tags: ['local', 'gemma4'],
+    },
 };
 
 /**

@@ -83,7 +83,8 @@
         "switch_to_malay": "Switch to Malay",
         "switch_to_malay_short": "MY",
         "user_token": "User Tokens",
-        "logout": "Logout"
+        "logout": "Logout",
+        "calculator": "Calculator"
     },
     "dashboard": {
         "hello": "Hello, User 👋",

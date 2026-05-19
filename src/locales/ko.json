@@ -76,7 +76,8 @@
         "switch_to_spanish_short": "ES",
         "switch_to_malay": "말레이어로 전환",
         "switch_to_malay_short": "MY",
-        "user_token": "사용자 토큰"
+        "user_token": "사용자 토큰",
+        "calculator": "계산기"
     },
     "dashboard": {
         "hello": "안녕하세요, 사용자님 👋",
@@ -817,7 +818,8 @@
             "pro_image_1_1": "이미지 생성 (1:1)",
             "claude_sonnet": "코드 추론 (Sonnet)",
             "claude_sonnet_thinking": "생각의 사슬 (Thinking)",
-            "claude_opus_thinking": "가장 강력한 생각 (Opus Thinking)"
+            "claude_opus_thinking": "가장 강력한 생각 (Opus Thinking)",
+            "gemma4": "로컬 지능 (Gemma 4)"
         },
         "mapping": {
             "title": "Claude Code 모델 매핑",

@@ -10,6 +10,7 @@ import TokenStats from './pages/TokenStats';
 import Security from './pages/Security';
 import ThemeManager from './components/common/ThemeManager';
 import UserToken from './pages/UserToken';
+import Calculator from './pages/Calculator';
 import { UpdateNotification } from './components/UpdateNotification';
 import DebugConsole from './components/debug/DebugConsole';
 import { useEffect, useState } from 'react';
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: 'monitor',
         element: <Monitor />,
+      },
+      {
+        path: 'calculator',
+        element: <Calculator />,
       },
       {
         path: 'token-stats',
